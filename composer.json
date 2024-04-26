@@ -1,0 +1,46 @@
+{
+    "name": "sbolch/word-counter",
+    "description": "A document word counter library.",
+    "keywords": [
+        "word",
+        "counter"
+    ],
+    "type": "package",
+    "license": "MIT",
+    "homepage": "https://github.com/sbolch/word-counter",
+    "authors": [
+        {
+            "name": "Szabolcs Surányi",
+            "email": "arnyek@arnyek.hu"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "sbolch\\WordCounter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=8.2",
+        "ext-fileinfo": "*",
+        "phpoffice/phpspreadsheet": "^2.0",
+        "smalot/pdfparser": "^2.9"
+    },
+    "require-dev": {
+        "phpoffice/phpword": "^1.2",
+        "phpunit/phpunit": "^11.1",
+        "symfony/var-dumper": "^7.0"
+    },
+    "suggest": {
+        "phpoffice/phpword": "Needed for Microsoft Word files if pandoc isn't installed on the system"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.x-dev"
+        }
+    }
+}
