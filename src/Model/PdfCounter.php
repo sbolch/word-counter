@@ -3,8 +3,8 @@
 namespace sbolch\WordCounter\Model;
 
 use Exception;
-use sbolch\WordCounter\CounterInterface;
 use Smalot\PdfParser\Parser;
+use sbolch\WordCounter\CounterInterface;
 
 class PdfCounter implements CounterInterface
 {
@@ -14,7 +14,7 @@ class PdfCounter implements CounterInterface
     /**
      * @throws Exception
      */
-    public function __construct(string $file)
+    public function __construct(string $file, bool $shell)
     {
         $pdf = (new Parser())->parseFile($file);
         $pages = $pdf->getPages();

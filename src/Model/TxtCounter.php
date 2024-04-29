@@ -6,28 +6,24 @@ use sbolch\WordCounter\CounterInterface;
 
 class TxtCounter implements CounterInterface
 {
-    private int $words;
-    private int $chars;
+    private bool $shell;
 
-    public function __construct(string $file)
+    public function __construct(private readonly string $file, bool $shell)
     {
-        if (`which wc`) {
-            $this->words = intval(`wc -w $file`);
-            $this->chars = intval(`wc -m $file`);
-        } else {
-            $content = file_get_contents($file);
-            $this->words = str_word_count($content);
-            $this->chars = strlen($content);
-        }
+        $this->shell = $shell && `which wc`;
     }
 
     public function words(): int
     {
-        return $this->words;
+        return $this->shell
+            ? intval(`wc -w $this->file`)
+            : str_word_count(file_get_contents($this->file));
     }
 
     public function characters(): int
     {
-        return $this->chars;
+        return $this->shell
+            ? intval(`wc -m $this->file`)
+            : strlen(file_get_contents($this->file));
     }
 }

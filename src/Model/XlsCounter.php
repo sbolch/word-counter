@@ -10,7 +10,7 @@ class XlsCounter implements CounterInterface
     private int $words;
     private int $chars;
 
-    public function __construct(string $file)
+    public function __construct(string $file, bool $shell)
     {
         $spreadsheet = IOFactory::load($file);
 

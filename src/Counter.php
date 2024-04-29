@@ -10,29 +10,17 @@ use sbolch\WordCounter\Model\XlsCounter;
 
 class Counter
 {
-    private CounterInterface $counter;
-
     /**
      * @throws Exception
      */
-    public function __construct(string $filePath)
+    public static function get(string $filePath, bool $shellAccess = true): CounterInterface
     {
-        $this->counter = match (mime_content_type($filePath)) {
-            'text/plain' => new TxtCounter($filePath),
-            'application/pdf' => new PdfCounter($filePath),
-            'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => new DocCounter($filePath),
-            'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => new XlsCounter($filePath),
+        return match (mime_content_type($filePath)) {
+            'text/plain' => new TxtCounter($filePath, $shellAccess),
+            'application/pdf' => new PdfCounter($filePath, $shellAccess),
+            'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => new DocCounter($filePath, $shellAccess),
+            'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => new XlsCounter($filePath, $shellAccess),
             default => throw new Exception('File format not supported.'),
         };
-    }
-
-    public function words(): int
-    {
-        return $this->counter->words();
-    }
-
-    public function characters(): int
-    {
-        return $this->counter->characters();
     }
 }

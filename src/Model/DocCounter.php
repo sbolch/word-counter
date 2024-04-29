@@ -7,51 +7,73 @@ use sbolch\WordCounter\CounterInterface;
 
 class DocCounter implements CounterInterface
 {
-    private int $words;
-    private int $chars;
+    private bool $shell;
+    private ?string $tempFile = null;
 
     /**
      * @throws Exception
      */
-    public function __construct(string $file)
+    public function __construct(private readonly string $file, bool $shell)
     {
-        if (`which pandoc` && `which wc`) {
-            $tempfile = tempnam(sys_get_temp_dir(), 'sbolch_wordcounter_').'.txt';
-            `pandoc -o $tempfile $file`;
+        $this->shell = $shell && `which pandoc` && `which wc`;
 
-            $this->words = intval(`wc -w $tempfile`);
-            $this->chars = intval(`wc -m $tempfile`);
+        if (!$this->shell && !class_exists(\PhpOffice\PhpWord\IOFactory::class)) {
+            throw new Exception('Neither phpoffice/phpword nor pandoc library is available.');
+        }
+    }
 
-            @unlink($tempfile);
-        } else {
-            if (!class_exists(\PhpOffice\PhpWord\IOFactory::class)) {
-                throw new Exception('Neither phpoffice/phpword nor pandoc library is available.');
-            }
-
-            $doc = \PhpOffice\PhpWord\IOFactory::load($file);
-
-            $this->words = 0;
-            $this->chars = 0;
-
-            foreach ($doc->getSections() as $section) {
-                foreach ($section->getElements() as $element) {
-                    if ($element instanceof \PhpOffice\PhpWord\Element\TextRun) {
-                        $content = $element->getText();
-                        $this->words += str_word_count($content);
-                        $this->chars += strlen(trim($content));
-                    }
-                }
-            }
+    public function __destruct() {
+        if ($this->tempFile) {
+            @unlink($this->tempFile);
         }
     }
 
     public function words(): int
     {
-        return $this->words;
+        if ($this->shell) {
+            $this->createTempFile();
+            return intval(`wc -w $this->tempFile`);
+        }
+
+        $doc = \PhpOffice\PhpWord\IOFactory::load($this->file);
+
+        $words = 0;
+        foreach ($doc->getSections() as $section) {
+            foreach ($section->getElements() as $element) {
+                if ($element instanceof \PhpOffice\PhpWord\Element\TextRun) {
+                    $words += str_word_count($element->getText());
+                }
+            }
+        }
+
+        return $words;
     }
 
     public function characters(): int
     {
-        return $this->chars;
+        if ($this->shell) {
+            $this->createTempFile();
+            return intval(`wc -m $this->tempFile`);
+        }
+
+        $doc = \PhpOffice\PhpWord\IOFactory::load($this->file);
+
+        $chars = 0;
+        foreach ($doc->getSections() as $section) {
+            foreach ($section->getElements() as $element) {
+                if ($element instanceof \PhpOffice\PhpWord\Element\TextRun) {
+                    $chars += strlen(trim($element->getText()));
+                }
+            }
+        }
+
+        return $chars;
+    }
+
+    private function createTempFile(): void {
+        if (!$this->tempFile) {
+            $this->tempFile = tempnam(sys_get_temp_dir(), 'sbolch_wordcounter_') . '.txt';
+            `pandoc -o $this->tempFile $this->file`;
+        }
     }
 }
