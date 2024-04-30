@@ -11,8 +11,10 @@ foreach (glob(__DIR__.'/tests/files/*') as $file) {
 
         $counter = Counter::get($file, false);
         echo pathinfo($file, PATHINFO_EXTENSION)."\t\twords: {$counter->words()}\tchars: {$counter->characters()}\n";
-    } catch (Exception) {
+    } catch (Exception $e) {
         echo pathinfo($file, PATHINFO_EXTENSION)."\t\tERROR\n";
+
+        dump($e->getMessage());
     }
 
     echo PHP_EOL;

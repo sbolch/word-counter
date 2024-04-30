@@ -26,17 +26,19 @@
     },
     "require": {
         "php": ">=8.2",
-        "ext-fileinfo": "*",
-        "phpoffice/phpspreadsheet": "^2.0",
-        "smalot/pdfparser": "^2.9"
+        "ext-fileinfo": "*"
     },
     "require-dev": {
+        "phpoffice/phpspreadsheet": "^2.0",
         "phpoffice/phpword": "^1.2",
         "phpunit/phpunit": "^11.1",
+        "smalot/pdfparser": "^2.10",
         "symfony/var-dumper": "^7.0"
     },
     "suggest": {
-        "phpoffice/phpword": "Needed for Microsoft Word files if pandoc isn't installed on the system"
+        "phpoffice/phpspreadsheet": "Needed for XLS/XLSX files",
+        "phpoffice/phpword": "Needed for DOCX files if pandoc isn't installed on the system or if you want to support DOC files as well",
+        "smalot/pdfparser": "Needed for PDF files"
     },
     "extra": {
         "branch-alias": {

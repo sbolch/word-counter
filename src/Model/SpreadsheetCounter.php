@@ -5,7 +5,7 @@ namespace sbolch\WordCounter\Model;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use sbolch\WordCounter\CounterInterface;
 
-class XlsCounter implements CounterInterface
+class SpreadsheetCounter implements CounterInterface
 {
     private int $words;
     private int $chars;
