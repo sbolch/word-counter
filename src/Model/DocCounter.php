@@ -10,11 +10,9 @@ class DocCounter implements CounterInterface
     /**
      * @throws Exception
      */
-    public function __construct(private readonly string $file, bool $shell)
+    public function __construct(protected readonly string $file, bool $shell)
     {
-        if (!class_exists(\PhpOffice\PhpWord\Reader\MsDoc::class)) {
-            throw new Exception('phpoffice/phpword library is not available.');
-        }
+        $this->init($shell);
     }
 
     public function words(): int
@@ -39,6 +37,16 @@ class DocCounter implements CounterInterface
         }
 
         return $chars;
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function init(bool $shell): void
+    {
+        if (!class_exists(\PhpOffice\PhpWord\Reader\MsDoc::class)) {
+            throw new Exception('phpoffice/phpword library is not available.');
+        }
     }
 
     protected function getTexts(object $doc): iterable

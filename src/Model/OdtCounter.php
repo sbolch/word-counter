@@ -5,29 +5,8 @@ namespace sbolch\WordCounter\Model;
 use Exception;
 use sbolch\WordCounter\CounterInterface;
 
-class OdtCounter extends DocCounter implements CounterInterface
+class OdtCounter extends DocxCounter implements CounterInterface
 {
-    private bool $shell;
-    private ?string $tempFile = null;
-
-    /**
-     * @throws Exception
-     */
-    public function __construct(private readonly string $file, bool $shell)
-    {
-        $this->shell = $shell && `which pandoc` && `which wc`;
-
-        if (!$this->shell && !class_exists(\PhpOffice\PhpWord\Reader\ODText::class)) {
-            throw new Exception('Neither phpoffice/phpword nor pandoc library is available.');
-        }
-    }
-
-    public function __destruct() {
-        if ($this->tempFile) {
-            @unlink($this->tempFile);
-        }
-    }
-
     public function words(): int
     {
         if ($this->shell) {
@@ -62,10 +41,15 @@ class OdtCounter extends DocCounter implements CounterInterface
         return $chars;
     }
 
-    private function createTempFile(): void {
-        if (!$this->tempFile) {
-            $this->tempFile = tempnam(sys_get_temp_dir(), 'sbolch_wordcounter_') . '.txt';
-            `pandoc -o $this->tempFile $this->file`;
+    /**
+     * @throws Exception
+     */
+    protected function init(bool $shell): void
+    {
+        $this->shell = $shell && `which pandoc` && `which wc`;
+
+        if (!$this->shell && !class_exists(\PhpOffice\PhpWord\Reader\ODText::class)) {
+            throw new Exception('Neither phpoffice/phpword nor pandoc library is available.');
         }
     }
 }
